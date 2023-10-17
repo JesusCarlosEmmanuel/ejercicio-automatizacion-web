@@ -1,0 +1,109 @@
+//En este bloque de código vamos a colocar la extracción de tareas de trello
+
+const puppeteer = require('puppeteer');
+
+(async () => {
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+
+  // Navegamos a la página de Trello
+  await page.goto('https://trello.com/b/QvHVksDa/personal-work-goals');
+
+  // Esperamos a que los elementos se carguen, puedes ajustar este valor
+  await page.waitForSelector('.task'); 
+
+  // Obtenemos la lista de tareas
+  const tasks = await page.$$eval('.task', elements => {
+    return elements.map(element => element.textContent);
+  });
+
+  console.log('Tareas en Trello:', tasks);
+
+  await browser.close();
+})();
+
+
+
+
+//En este bloque de código vamos a realizar el el inicio de sesión a Todoist
+
+// Navegamos a la página de inicio de sesión de Todoist
+await page.goto('https://todoist.com/users/showlogin');
+
+// Esperamos a que los elementos se carguen
+await page.waitForSelector('#email');
+await page.waitForSelector('#password');
+
+// Ingresamos las credenciales
+await page.type('#email', 'jesusjimenez.computerengineer@gmail.com'); // Colocamos nuestra dirección de correo
+await page.type('#password', 'mypassword'); //colocamos nuestra contraseña
+
+// Hacemos clic en el botón de inicio de sesión
+await page.click('.submit_btn');
+
+// Manejamos errores aquí, por ejemplo, si las credenciales son incorrectas
+await page.waitForSelector('.Las crecenciales son incorrectas'); // Selector para el mensaje de error
+
+// Cerramos el navegador
+await browser.close();
+
+
+
+
+// En este bloque de código vamos a agregar las tareas a Todoist
+
+// Navegamos a la página de creación de tareas en Todoist
+await page.goto('https://todoist.com/app');
+
+// Esperamos a que el elemento de creación de tarea se cargue
+await page.waitForSelector('.quick_add');
+
+// Colocamos las tareas de Trello
+const tasksFromTrello = ['Lower blood pressure', 'Use MyFitnessPal without skipping days', 'Obtain 10,000 steps a day on average using my Fitbit', 'Run a 10k before the end of the year', 'Meditate three times a week'];
+
+for (const task of tasksFromTrello) {
+  // Hacemos clic en el campo de creación de tarea y lo llenamos
+  await page.click('.quick_add');
+  await page.type('.quick_add', task);
+
+  // Simulamos presionar la tecla "Enter" para agregar la tarea
+  await page.keyboard.press('Enter');
+}
+
+// Aquí colocamos el manejo de errores
+
+try {
+  await page.goto('https://todoist.com/app');
+  await page.waitForSelector('.quick_add');
+  
+  const tasksFromTrello = ['Lower blood pressure', 'Use MyFitnessPal without skipping days', 'Obtain 10,000 steps a day on average using my Fitbit', 'Run a 10k before the end of the year', 'Meditate three times a week'];
+
+  for (const task of tasksFromTrello) {
+    await page.click('.quick_add');
+    await page.type('.quick_add', task);
+    await page.keyboard.press('Enter');
+  }
+} catch (error) {
+  console.error('Error al agregar tareas a Todoist:', error);
+}
+
+// Cerramos el navegador
+await browser.close();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
